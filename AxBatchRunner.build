@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project name="AxBatchRunner" default="build" xmlns="http://nant.sf.net/release/0.90/nant.xsd">
+  
+  <property name="solution.file.name" value="AxBatchRunner.sln"/>
+  <property name="project.config" value="debug"/>
+
+  <!-- Folder lyaout/Naming information -->
+  <property name="solution.dir" value="."/>
+  <property name="build.output.dir" value="${solution.dir}/AutomatedBuildOutput"/>
+  <property name="tests.output.dir" value="${build.output.dir}/UnitTestsOutput"/>
+  <property name="coverage.output.dir" value="${build.output.dir}/CodeCoverageOutput"/>
+  <property name="assemblies.output.dir" value="${build.output.dir}/${nant.settings.currentframework}.${platform::get-name()}-${project::get-name()}-${project.config}/"/>
+
+  <property name="tools.dir" value="Tools"/>
+  <property name="path.ncover.console" value="${tools.dir}/NCover/NCover.Console.exe"/>
+  <property name="path.ncover.explorer" value="${tools.dir}/NCover/NCoverExplorer.Console.exe"/>
+  <property name="path.ncover.explorer.nantTasks" value="${tools.dir}/NCover/Build Task Plugins/NCoverExplorer.NAntTasks.dll"/>
+  <property name="path.nunit.console" value="${tools.dir}/NUnit/bin/net-2.0/nunit-console.exe"/>
+  <property name="path.coverlib.dll" value="${tools.dir}/NCover/CoverLib.dll"/>
+  <property name="nunit.console.args" value="/xml:${coverage.output.dir}\Tests.xml"/>
+  <property name="coverage.xml.file" value="${coverage.output.dir}\Coverage.xml"/>
+  
+  <target name="build" depends="compile.source, tests.run.AxBatchRunner" />
+   
+  <target name="clean.source">
+    <exec program="${framework::get-framework-directory(framework::get-target-framework())}\msbuild.exe"
+          commandline="${solution.file.name} /t:Clean /p:Configuration=${project.config} /v:q" workingdir="." />
+    <echo message="Clean finished"/>
+  </target>
+
+  <target name="compile.source" depends="clean.source">
+    <exec program="${framework::get-framework-directory(framework::get-target-framework())}\msbuild.exe"
+          commandline="${solution.file.name} /t:Rebuild /p:Configuration=${project.config} /v:q" workingdir="." />
+    <echo message="Compile finished"/>
+  </target>
+
+  <target name="setup.build.process" description="Initialize build properties">
+    <delete dir="${build.output.dir}" failonerror="false" />
+    <mkdir dir="${build.output.dir}"/>
+    <mkdir dir="${tests.output.dir}"/>
+    <echo message="Current Directory: ${project::get-base-directory()}"/>
+  </target>
+
+  <target name="move.assemblies.for.tests" depends="compile.source">
+    <property name="AxBatchRunner.Tests.bin.dir" value="/AxBatchRunner.Tests/bin/Debug"/>
+    <echo message="Moving contents of ${AxBatchRunner.Tests.bin.dir} to ${assemblies.output.dir}"/>
+    <copy todir="${assemblies.output.dir}" flatten="true">
+      <fileset basedir="${solution.dir}${AxBatchRunner.Tests.bin.dir}">
+        <include name="*.dll"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="tests.run.AxBatchRunner" depends="compile.source, move.assemblies.for.tests">
+    <echo message="Starting to run tests"/>
+    <nunit2 haltonfailure="false" failonerror="false" verbose="true">
+      <formatter type="Xml" extension=".xml" outputdir="${tests.output.dir}" usefile="true"/>
+      <test assemblyname="${assemblies.output.dir}/AxBatchRunner.Tests.dll" />
+    </nunit2>
+  </target>
+ 
+</project>

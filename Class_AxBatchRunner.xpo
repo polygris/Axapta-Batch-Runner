@@ -1,0 +1,420 @@
+Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Business Solutions-Axapta Class: AxBatchRunner, выгружен Пятница 18.06.2010
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #AxBatchRunner
+    PROPERTIES
+      Name                #AxBatchRunner
+      Extends             #
+      RunOn               #Server
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #parmCancelJobIfError
+        #public boolean parmCancelJobIfError(boolean _cancelJobIfError = cancelJobIfError)
+        #{
+        #    cancelJobIfError = _cancelJobIfError;
+        #    return cancelJobIfError;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #calcTimepassed
+        #private Minutes calcTimepassed()
+        #{
+        #    return (today()-lastJobDate)*#minutesPerDay + (timeNow()-lastJobTime)/#secondsPerMinute;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #classDeclaration
+        #public class AxBatchRunner
+        #{
+        #    BatchGroupId    groupId;
+        #    boolean         cancelJobIfError;
+        #
+        #    NoYes           privateBatch;
+        #    Minutes         timeOut;
+        #    NoYes           closeCompany;
+        #
+        #    TransDate       lastJobDate;
+        #    timeOfDay       lastJobTime;
+        #
+        #    #timeconstants
+        #}
+        #
+      ENDSOURCE
+      SOURCE #doBatch
+        #public str doBatch()
+        #{
+        #    recId           batchId;
+        #    Batch           batch;
+        #    ;
+        #
+        #    lastJobDate = today();
+        #    lastJobTime = timeNow();
+        #
+        #    batchId = 0;
+        #
+        #    ttsbegin;
+        #
+        #    batch = this.search();
+        #    if (batch)
+        #    {
+        #        batchId             = batch.recId;
+        #
+        #        // Set orig fields before start fields
+        #        batch.setOrig();
+        #
+        #        batch.executedBy   = curUserId();
+        #        batch.status       = BatchStatus::Executing;
+        #        batch.update();
+        #    }
+        #
+        #    ttscommit;
+        #
+        #    if (batchId)
+        #    {
+        #        if (!Batch::existRecId(batchId))
+        #        {
+        #            error(strFmt("@SYS24642",batchId));
+        #        }
+        #
+        #        return this.runJob(batchId);
+        #    }
+        #    else
+        #    {
+        #        if (timeOut && (this.calcTimepassed() >= timeOut))
+        #        {
+        #            if (closeCompany)
+        #            {
+        #                throw error("@SYS7701");
+        #            }
+        #        }
+        #        BatchRun::cleanUpExecuting();
+        #        return "";
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #finishJob
+        #private void finishJob(
+        #    Batch       batch,
+        #    boolean     reused  // Is true when the current job was reused.
+        #    )
+        #{
+        #    ;
+        #    if (cancelJobIfError)
+        #    {
+        #        if (batch.status != BatchStatus::Finished)
+        #        return;
+        #    }
+        #
+        #    [Batch.StartDate, batch.StartTime] = SysRecurrence::next(batch.recurrenceData, batch.StartDate, batch.StartTime);
+        #
+        #    if (! Batch.StartDate)
+        #        return;
+        #
+        #    batch.setOrig();
+        #    batch.status    = BatchStatus::Waiting;
+        #    batch.endDate   = dateNull();
+        #    batch.endTime   = 0;
+        #    batch.reused    = reused;
+        #    batch.overwriteSystemfields(true);
+        #    batch.(fieldnum(batch,createdBy)) = batch.createdBy;
+        #
+        #    if (reused)
+        #    {
+        #        batch.update();
+        #    }
+        #    else
+        #    {
+        #        batch.insert();
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #parmGroupId
+        #public BatchGroupId parmGroupId(BatchGroupId _groupId = groupId)
+        #{
+        #    groupId = _groupId;
+        #
+        #    return groupId;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #prepareMessage
+        #private str prepareMessage(  Batch          batch,
+        #                             Batch          finishedBatch,
+        #                             RunBaseBatch   runBaseBatch    = null
+        #                          )
+        #{
+        #    str         msg;
+        #    ;
+        #
+        #    msg  = strFmt("Status: %1, ", finishedBatch.status);
+        #    msg += strFmt("Started %1 at %2, ", finishedBatch.StartDate, time2str(finishedBatch.StartTime,-1,-1));
+        #    msg += strFmt("Finished %1 at %2, ", finishedBatch.endDate, time2str(finishedBatch.endTime,-1,-1));
+        #
+        #    if (batch.hasInfo())
+        #    {
+        #        msg += "Infolog: " + Info::infoCon2Str(batch.Info);
+        #    }
+        #    else
+        #        msg += "Infolog is empty.";
+        #
+        #    return msg;
+        #}
+      ENDSOURCE
+      SOURCE #runJob
+        #private str runJob(recId batchId)
+        #{
+        #    Batch           batch = Batch::findRecId(batchId);
+        #    Batch           finishedBatch;
+        #    RunBaseBatch    runBaseBatch;
+        #    boolean         isErrorCaught;
+        #    Exception       exception;
+        #    Integer         infoCnt;
+        #    boolean         reused;
+        #    TimeOfDay       actualStartTime = timeNow();
+        #    StartDate       actualStartDate = today();
+        #
+        #    infoCnt = infolog.line();
+        #
+        #    try
+        #    {
+        #        if (! CompanyTmpCheck::exist(batch.company))
+        #        {
+        #            throw error(strFmt("@SYS10666",batch.company));
+        #        }
+        #
+        #        changecompany(batch.company)
+        #        {
+        #            runBaseBatch = batch.object();
+        #
+        #            infolog.updateViewSet(runBaseBatch);
+        #
+        #            if (runbaseBatch.isSysSignUsed())
+        #            {
+        #                runBaseBatch.unpack(SysSign::runClassUnpackFromParameters(batch.Parameters));
+        #                runbasebatch.parmSysSign(SysSign::newFromContainer(SysSign::packFromParameters(batch.Parameters)));
+        #            }
+        #            else
+        #            {
+        #                runBaseBatch.unpack(batch.Parameters);
+        #            }
+        #
+        #            runBaseBatch.parmInBatch(true);
+        #            runbaseBatch.setCreatedByUserId(batch.createdBy);
+        #            runBaseBatch.run();
+        #        }
+        #    }
+        #    //If we can get the exception type - this can be rewritten to catch all
+        #    catch (Exception::Info)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Info;
+        #    }
+        #    catch (Exception::Warning)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Warning;
+        #    }
+        #    catch (Exception::Deadlock)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Deadlock;
+        #    }
+        #    catch (Exception::Error)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Error;
+        #    }
+        #    catch (Exception::Internal)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Internal;
+        #    }
+        #    catch (Exception::Break)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Break;
+        #    }
+        #    catch (Exception::DDEerror)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::DDEerror;
+        #    }
+        #    catch (Exception::Sequence)
+        #    {
+        #        isErrorCaught   = true;
+        #        exception       = Exception::Sequence;
+        #    }
+        #
+        #    ttsbegin;
+        #
+        #    batch = Batch::findRecId(batch.recId,true);
+        #
+        #    if (infolog.line() > infoCnt)
+        #    {
+        #        batch.info = infolog.copy(infoCnt+1,infolog.line());
+        #    }
+        #    if (isErrorCaught)
+        #    {
+        #        batch.status           = BatchStatus::Error;
+        #        batch.exceptionCode    = exception;
+        #        [batch.StartDate, batch.StartTime] = SysRecurrence::next(batch.recurrenceData, batch.StartDate, batch.StartTime);
+        #
+        #        infolog.updateViewSet(null);
+        #
+        #        if (runbaseBatch)
+        #            reused = runbaseBatch.canReuseBatch();
+        #    }
+        #    else
+        #    {
+        #        batch.status = BatchStatus::Finished;
+        #    }
+        #
+        #    batch.endDate  = today();
+        #    batch.endTime  = timeNow();
+        #    batch.update();
+        #    finishedBatch  = batch.data();
+        #
+        #    this.finishJob(batch, reused); //Create recurring batch record
+        #
+        #    if (reused)
+        #    {
+        #        finishedBatch.StartDate = actualStartDate;
+        #        finishedBatch.StartTime = actualStartTime;
+        #    }
+        #    else
+        #    {
+        #        finishedBatch = Batch::findRecId(finishedBatch.RecId, true);
+        #        finishedBatch.StartDate = actualStartDate;
+        #        finishedBatch.StartTime = actualStartTime;
+        #        finishedBatch.update();
+        #    }
+        #    ttscommit;
+        #
+        #    infolog.updateViewSet(null);
+        #
+        #    return this.prepareMessage(batch, finishedBatch, runBaseBatch);
+        #}
+      ENDSOURCE
+      SOURCE #search
+        #private Batch search()
+        #{
+        #    Batch   _batch;
+        #;
+        #    _batch.selectForUpdate(true);
+        #
+        #    select _batch
+        #        index statusIdx
+        #        order by status,priority,createdDate,createdTime
+        #        where _batch.status      == BatchStatus::Waiting    &&
+        #              _batch.private     == privateBatch            &&
+        #              _batch.startDate   <= today()                 &&
+        #              (_batch.startDate  <  today() ||
+        #               _batch.startTime  <= timeNow()
+        #              )                                             &&
+        #              _batch.groupId     == groupId                 &&
+        #              (! privateBatch || _batch.createdBy == curUserId());
+        #
+        #    return _batch;
+        #}
+      ENDSOURCE
+      SOURCE #validate
+        #private boolean validate()
+        #{
+        #    boolean     ok = true;
+        #    ;
+        #
+        #    ok = BatchGroup::checkExist(groupId) && ok;
+        #
+        #    return ok;
+        #}
+      ENDSOURCE
+      SOURCE #cleanUpExecuting
+        #/*MAN
+        #Checks whether there are any jobs where the owner no longer is active.
+        #If thatґs a fact, the actuel batches are released.
+        #*/
+        #// AOSRunMode::Server
+        #server static public void cleanUpExecuting(boolean checkSession = false)
+        #{
+        #    Batch _batch;
+        #
+        #    ttsbegin;
+        #
+        #    while select forupdate _batch
+        #        where _batch.status      == BatchStatus::Executing  &&
+        #              _batch.sessionIdx  >  0
+        #    {
+        #        if (! _batch.isSessionActive(checkSession))
+        #        {
+        #            _batch.status = BatchStatus::Waiting;
+        #            _batch.update();
+        #        }
+        #    }
+        #
+        #    ttscommit;
+        #}
+      ENDSOURCE
+      SOURCE #construct
+        #static AxBatchRunner construct()
+        #{
+        #    return new AxBatchRunner();
+        #}
+      ENDSOURCE
+      SOURCE #description
+        #client server static ClassDescription description()
+        #{
+        #    return "Запуск классов RunBaseBatch из Business Connnector";
+        #}
+      ENDSOURCE
+      SOURCE #hasBatches
+        #static boolean hasBatches(BatchGroupId groupId)
+        #{
+        #    Batch   _batch;
+        #    boolean hasBatches = false;
+        #    ;
+        #
+        #    select _batch
+        #        index statusIdx
+        #        order by status,priority,createdDate,createdTime
+        #        where _batch.status      == BatchStatus::Waiting    &&
+        #              _batch.startDate   <= today()                 &&
+        #              (_batch.startDate  <  today() ||
+        #               _batch.startTime  <= timeNow()
+        #              )                                             &&
+        #              _batch.groupId     == groupId;
+        #
+        #    if (_batch.RecId)
+        #    {
+        #        hasBatches = true;
+        #    }
+        #    else
+        #    {
+        #        hasBatches = false;
+        #    }
+        #
+        #    return hasBatches;
+        #}
+      ENDSOURCE
+      SOURCE #mainDo
+        #static str mainDo(BatchGroupId _groupId, boolean _cancelJobIfError = true)
+        #{
+        #    AxBatchRunner runner = AxBatchRunner::construct();
+        #    runner.parmGroupId(_groupId);
+        #    runner.parmCancelJobIfError(_cancelJobIfError);
+        #
+        #    return runner.doBatch();
+        #}
+        #
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END
