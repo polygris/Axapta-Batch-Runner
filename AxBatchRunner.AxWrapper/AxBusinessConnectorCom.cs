@@ -39,7 +39,6 @@ namespace AxBatchRunner.AxWrapper
         /// <param name = "company">Name of the company to logon</param>
         /// <param name = "language">Language of the user</param>
         /// <param name = "configuration">Configuration name to use for the client</param>
-        /// <param name = "serverManager">Server Manager</param>
         /// <param name = "objectServer">Axapta Server to logon (AOS)</param>
         /// <exception cref = "AxException">Thrown when logon attempt fails</exception>
         public void Logon(string user, string password, string company, string language, string configuration,
@@ -49,7 +48,10 @@ namespace AxBatchRunner.AxWrapper
             {
                 if (_connections.Value > 0)
                 {
-                    ShutdownComPlus();
+                    //ShutdownComPlus();
+                    Logoff();
+                    _connections.Decrement();
+                    _axaptaAdapter = new Axapta2Class();
                 }
                 _axaptaAdapter.Logon2(user, password, company, language, "", "", configuration, false, null, null);
                 _connections.Increment();
@@ -71,9 +73,9 @@ namespace AxBatchRunner.AxWrapper
                 _axaptaAdapter.Logoff();
                 if (_connections.Value > 0)
                 {
-                    ShutdownComPlus();                    
+                    ShutdownComPlus();
+                    _connections.Decrement();
                 }
-                _connections.Decrement();
             }
             catch (COMException exception)
             {

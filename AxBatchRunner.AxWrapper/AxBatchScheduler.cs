@@ -53,6 +53,11 @@ namespace AxBatchRunner.AxWrapper
             get { return _isShutdownProcess.Value; }
         }
 
+        public AxProxy Proxy
+        {
+            get { return _proxy; }
+        }
+
         /// <summary>
         ///   Run derived class of RunBaseBatch
         /// </summary>

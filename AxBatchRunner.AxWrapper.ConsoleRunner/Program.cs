@@ -15,7 +15,7 @@ namespace AxBatchRunner.ConsoleRunner
             axSettings3.Company = "ais";
             axSettings3.Language = "ru";
             axSettings3.ComPlusAppl = "Navision Axapta Business Connector";
-            axSettings3.Configuration = "ZCH_DEV_3T";
+            axSettings3.Configuration = "ZCH_TEST_3T";
             axSettings3.BatchGroup = "PR2";
             axSettings3.CancelJobIfError = false;
             axSettings3.TimerInterval = 10;
@@ -34,6 +34,10 @@ namespace AxBatchRunner.ConsoleRunner
 
             AxBatchScheduler scheduler = new AxBatchScheduler(axSettings3);
             scheduler.Start();
+
+            //AxConfig config = scheduler.Proxy.GetConfig();
+            //Console.WriteLine(config);
+
             Console.ReadLine();
             scheduler.Stop();
         }

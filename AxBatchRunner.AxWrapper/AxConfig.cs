@@ -8,12 +8,19 @@ namespace AxBatchRunner.AxWrapper
         private readonly bool _isAos;
         private readonly string _licenceName;
         private readonly string _serialNo;
+        private readonly string _aosName;
 
-        public AxConfig(string serialNo, string licenseName, bool isAos)
+        public AxConfig(string serialNo, string licenseName, bool isAos, string aosName)
         {
             _serialNo = serialNo;
+            _aosName = aosName;
             _licenceName = licenseName;
             _isAos = isAos;
+        }
+
+        public string AOSName
+        {
+            get { return _aosName; }
         }
 
         public bool IsAos
@@ -33,7 +40,7 @@ namespace AxBatchRunner.AxWrapper
 
         public override string ToString()
         {
-            return string.Format("SerialNo: {0}, LicenseName: {1}, IsAOS: {2}", SerialNo, LicenseName, IsAos);
+            return string.Format("SerialNo: {0}, LicenseName: {1}, IsAOS: {2}, AOSName: {3}", SerialNo, LicenseName, IsAos, AOSName);
         }
     }
 }

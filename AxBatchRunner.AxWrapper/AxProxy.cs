@@ -82,7 +82,8 @@ namespace AxBatchRunner.AxWrapper
         {
             return new AxConfig((string) _connector.CallStatic("xInfo", "serialNo"),
                                 (string) _connector.CallStatic("xInfo", "licenseName"),
-                                (bool) _connector.CallStatic("xGlobal", "isAOS"));
+                                (bool) _connector.CallStatic("xGlobal", "isAOS"),
+                                (string)_connector.CallStatic(_settings.BatchRunnerClass, "getAOSName"));
         }
 
         /// <summary>
