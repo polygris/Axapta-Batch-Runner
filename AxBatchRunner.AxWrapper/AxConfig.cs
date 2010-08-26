@@ -3,7 +3,7 @@ namespace AxBatchRunner.AxWrapper
     /// <summary>
     ///   Class for store information about Axapta configuration
     /// </summary>
-    public class AxConfig
+    public sealed class AxConfig
     {
         private readonly bool _isAos;
         private readonly string _licenceName;
@@ -18,21 +18,33 @@ namespace AxBatchRunner.AxWrapper
             _isAos = isAos;
         }
 
+        /// <summary>
+        ///   Application object server name
+        /// </summary>
         public string AOSName
         {
             get { return _aosName; }
         }
 
+        /// <summary>
+        ///   Running on AOS?
+        /// </summary>
         public bool IsAos
         {
             get { return _isAos; }
         }
 
+        /// <summary>
+        ///   License holder name
+        /// </summary>
         public string LicenseName
         {
             get { return _licenceName; }
         }
 
+        /// <summary>
+        ///   Serial number for Axapta installation
+        /// </summary>
         public string SerialNo
         {
             get { return _serialNo; }
@@ -40,7 +52,8 @@ namespace AxBatchRunner.AxWrapper
 
         public override string ToString()
         {
-            return string.Format("SerialNo: {0}, LicenseName: {1}, IsAOS: {2}, AOSName: {3}", SerialNo, LicenseName, IsAos, AOSName);
+            return string.Format("SerialNo: {0}, LicenseName: {1}, IsAOS: {2}, AOSName: {3}", SerialNo, LicenseName,
+                                 IsAos, AOSName);
         }
     }
 }

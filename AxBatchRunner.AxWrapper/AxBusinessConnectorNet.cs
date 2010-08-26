@@ -4,7 +4,7 @@ using Microsoft.Dynamics.BusinessConnectorNet;
 
 namespace AxBatchRunner.AxWrapper
 {
-    internal class AxBusinessConnectorNet : IAxBusinessConnector
+    internal sealed class AxBusinessConnectorNet : IAxBusinessConnector
     {
         private readonly Axapta _axaptaAdapter;
 
@@ -35,19 +35,16 @@ namespace AxBatchRunner.AxWrapper
         /// <param name = "password">Password of the user</param>
         /// <param name = "company">Name of the company to logon</param>
         /// <param name = "language">Language of the user</param>
-        /// <param name = "serverManager">Server Manager</param>
-        /// <param name = "objectServer">Axapta Server to logon (AOS)</param>
         /// <param name = "configuration">Configuration name to use for the client</param>
         /// <exception cref = "AxException">Thrown when logon attempt fails</exception>
         /// <remarks>
         ///   Calls the Logon method with the appropriate parameters
         /// </remarks>
-        public void Logon(string user, string password, string company, string language, string configuration,
-                          string objectServer)
+        public void Logon(string user, string password, string company, string language, string configuration)
         {
             try
             {
-                _axaptaAdapter.Logon(company, language, objectServer, configuration);
+                _axaptaAdapter.Logon(company, language, null, configuration);
             }
             catch (AxaptaException exception)
             {
@@ -136,6 +133,29 @@ namespace AxBatchRunner.AxWrapper
         }
 
         /// <summary>
+        ///   Calls an Axapta class static method.
+        /// </summary>
+        /// <param name = "className">Name of the class</param>
+        /// <param name = "methodName">Name of the static method</param>
+        /// <param name = "param1">Parameter 1</param>
+        /// <param name = "param2">Parameter 2</param>
+        /// <param name = "param3">Parameter 3</param>
+        /// <returns>Value returned by Axapta</returns>
+        /// <exception cref = "AxException">Thrown when there is an exception in calling the static method.</exception>
+        public object CallStatic(string className, string methodName, object param1, object param2, object param3)
+        {
+            try
+            {
+                return _axaptaAdapter.CallStaticClassMethod(className, methodName, param1, param2, param3);
+            }
+            catch (AxaptaException exception)
+            {
+                throw new AxException(string.Format("Call static method failed: {0}", exception),
+                                      exception.InnerException);
+            }
+        }
+
+        /// <summary>
         ///   Implementation of the Dispose Pattern
         /// </summary>
         public void Dispose()
@@ -147,7 +167,7 @@ namespace AxBatchRunner.AxWrapper
         /// <summary>
         ///   Implementation of the Dispose Pattern
         /// </summary>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing)
             {

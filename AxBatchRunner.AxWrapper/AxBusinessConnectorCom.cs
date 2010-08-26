@@ -6,7 +6,7 @@ using AxaptaCOMConnector;
 
 namespace AxBatchRunner.AxWrapper
 {
-    internal class AxBusinessConnectorCom : IAxBusinessConnector
+    internal sealed class AxBusinessConnectorCom : IAxBusinessConnector
     {
         private IAxapta2 _axaptaAdapter;
         public string ComPlusAppl { get; set; }
@@ -39,16 +39,13 @@ namespace AxBatchRunner.AxWrapper
         /// <param name = "company">Name of the company to logon</param>
         /// <param name = "language">Language of the user</param>
         /// <param name = "configuration">Configuration name to use for the client</param>
-        /// <param name = "objectServer">Axapta Server to logon (AOS)</param>
         /// <exception cref = "AxException">Thrown when logon attempt fails</exception>
-        public void Logon(string user, string password, string company, string language, string configuration,
-                          string objectServer)
+        public void Logon(string user, string password, string company, string language, string configuration)
         {
             try
             {
                 if (_connections.Value > 0)
                 {
-                    //ShutdownComPlus();
                     Logoff();
                     _connections.Decrement();
                     _axaptaAdapter = new Axapta2Class();
@@ -79,7 +76,8 @@ namespace AxBatchRunner.AxWrapper
             }
             catch (COMException exception)
             {
-                throw new AxException(string.Format("Logoff failed from axapta: {0}", exception), exception.InnerException);
+                throw new AxException(string.Format("Logoff failed from axapta: {0}", exception),
+                                      exception.InnerException);
             }
         }
 
@@ -98,7 +96,8 @@ namespace AxBatchRunner.AxWrapper
             }
             catch (COMException exception)
             {
-                throw new AxException(string.Format("Call static method failed: {0}", exception), exception.InnerException);
+                throw new AxException(string.Format("Call static method failed: {0}", exception),
+                                      exception.InnerException);
             }
         }
 
@@ -118,7 +117,8 @@ namespace AxBatchRunner.AxWrapper
             }
             catch (COMException exception)
             {
-                throw new AxException(string.Format("Call static method failed: {0}", exception), exception.InnerException);
+                throw new AxException(string.Format("Call static method failed: {0}", exception),
+                                      exception.InnerException);
             }
         }
 
@@ -140,7 +140,32 @@ namespace AxBatchRunner.AxWrapper
             }
             catch (COMException exception)
             {
-                throw new AxException(string.Format("Call static method failed: {0}", exception), exception.InnerException);
+                throw new AxException(string.Format("Call static method failed: {0}", exception),
+                                      exception.InnerException);
+            }
+        }
+
+        /// <summary>
+        ///   Calls an Axapta class static method.
+        /// </summary>
+        /// <param name = "className">Name of the class</param>
+        /// <param name = "methodName">Name of the static method</param>
+        /// <param name = "param1">Parameter 1</param>
+        /// <param name = "param2">Parameter 2</param>
+        /// <param name = "param3">Parameter 3</param>
+        /// <exception cref="AxException"></exception>
+        /// <returns>Thrown when there is an exception in calling the static method.</returns>
+        public object CallStatic(string className, string methodName, object param1, object param2, object param3)
+        {
+            try
+            {
+                return _axaptaAdapter.CallStaticClassMethod(className, methodName, param1, param2, param3, null, null,
+                                                            null);
+            }
+            catch (COMException exception)
+            {
+                throw new AxException(string.Format("Call static method failed: {0}", exception),
+                                      exception.InnerException);
             }
         }
 
@@ -165,18 +190,30 @@ namespace AxBatchRunner.AxWrapper
         /// </summary>
         public void Dispose()
         {
-            if ((_axaptaAdapter != null))
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///   Implementation of the Dispose Pattern
+        /// </summary>
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                try
+                if ((_axaptaAdapter != null))
                 {
-                    _axaptaAdapter.Logoff();
-                    ShutdownComPlus();
+                    try
+                    {
+                        _axaptaAdapter.Logoff();
+                        ShutdownComPlus();
+                    }
+                    catch
+                    {
+                    }
                 }
-                catch
-                {
-                }
+                _axaptaAdapter = null;
             }
-            _axaptaAdapter = null;
         }
 
         /// <summary>

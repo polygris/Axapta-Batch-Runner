@@ -3,7 +3,7 @@ Formatversion: 1
 
 ***Element: CLS
 
-; Microsoft Business Solutions-Axapta Class: AxBatchRunner, выгружен Пятница 18.06.2010
+; Microsoft Business Solutions-Axapta Class: AxBatchRunner, выгружен Четверг 26.08.2010
 ; --------------------------------------------------------------------------------
   CLSVERSION 1
   
@@ -16,14 +16,6 @@ Formatversion: 1
     
     METHODS
       Version: 3
-      SOURCE #parmCancelJobIfError
-        #public boolean parmCancelJobIfError(boolean _cancelJobIfError = cancelJobIfError)
-        #{
-        #    cancelJobIfError = _cancelJobIfError;
-        #    return cancelJobIfError;
-        #}
-        #
-      ENDSOURCE
       SOURCE #calcTimepassed
         #private Minutes calcTimepassed()
         #{
@@ -36,6 +28,7 @@ Formatversion: 1
         #{
         #    BatchGroupId    groupId;
         #    boolean         cancelJobIfError;
+        #    boolean         delBatchAfterSuccess;
         #
         #    NoYes           privateBatch;
         #    Minutes         timeOut;
@@ -136,6 +129,23 @@ Formatversion: 1
         #    }
         #}
       ENDSOURCE
+      SOURCE #parmCancelJobIfError
+        #public boolean parmCancelJobIfError(boolean _cancelJobIfError = cancelJobIfError)
+        #{
+        #    cancelJobIfError = _cancelJobIfError;
+        #    return cancelJobIfError;
+        #}
+        #
+      ENDSOURCE
+      SOURCE #parmDelBatchAfterSuccess
+        #// delete barch record after successful job
+        #public boolean parmDelBatchAfterSuccess(boolean _delBatchAfterSuccess = delBatchAfterSuccess)
+        #{
+        #    delBatchAfterSuccess = _delBatchAfterSuccess;
+        #    return delBatchAfterSuccess;
+        #}
+        #
+      ENDSOURCE
       SOURCE #parmGroupId
         #public BatchGroupId parmGroupId(BatchGroupId _groupId = groupId)
         #{
@@ -148,7 +158,7 @@ Formatversion: 1
       SOURCE #prepareMessage
         #private str prepareMessage(  Batch          batch,
         #                             Batch          finishedBatch,
-        #                             RunBaseBatch   runBaseBatch    = null
+        #                             str            infoLogText
         #                          )
         #{
         #    str         msg;
@@ -158,9 +168,9 @@ Formatversion: 1
         #    msg += strFmt("Started %1 at %2, ", finishedBatch.StartDate, time2str(finishedBatch.StartTime,-1,-1));
         #    msg += strFmt("Finished %1 at %2, ", finishedBatch.endDate, time2str(finishedBatch.endTime,-1,-1));
         #
-        #    if (batch.hasInfo())
+        #    if (infoLogText)
         #    {
-        #        msg += "Infolog: " + Info::infoCon2Str(batch.Info);
+        #        msg += "Infolog: " + infoLogText;
         #    }
         #    else
         #        msg += "Infolog is empty.";
@@ -180,6 +190,10 @@ Formatversion: 1
         #    boolean         reused;
         #    TimeOfDay       actualStartTime = timeNow();
         #    StartDate       actualStartDate = today();
+        #    str             infoLogText;
+        #    str             retStr;
+        #    Batch           batchForDelete;
+        #    ;
         #
         #    infoCnt = infolog.line();
         #
@@ -193,8 +207,6 @@ Formatversion: 1
         #        changecompany(batch.company)
         #        {
         #            runBaseBatch = batch.object();
-        #
-        #            infolog.updateViewSet(runBaseBatch);
         #
         #            if (runbaseBatch.isSysSignUsed())
         #            {
@@ -260,14 +272,13 @@ Formatversion: 1
         #    if (infolog.line() > infoCnt)
         #    {
         #        batch.info = infolog.copy(infoCnt+1,infolog.line());
+        #        infoLogText = Info::infoCon2Str(batch.Info);
         #    }
         #    if (isErrorCaught)
         #    {
         #        batch.status           = BatchStatus::Error;
         #        batch.exceptionCode    = exception;
         #        [batch.StartDate, batch.StartTime] = SysRecurrence::next(batch.recurrenceData, batch.StartDate, batch.StartTime);
-        #
-        #        infolog.updateViewSet(null);
         #
         #        if (runbaseBatch)
         #            reused = runbaseBatch.canReuseBatch();
@@ -298,9 +309,18 @@ Formatversion: 1
         #    }
         #    ttscommit;
         #
-        #    infolog.updateViewSet(null);
+        #    infolog.clear();
+        #    retStr = this.prepareMessage(batch, finishedBatch, infoLogText);
         #
-        #    return this.prepareMessage(batch, finishedBatch, runBaseBatch);
+        #    if (delBatchAfterSuccess)
+        #    {
+        #        ttsbegin;
+        #        batchForDelete = Batch::findRecId(finishedBatch.RecId, true);
+        #        batchForDelete.delete();
+        #        ttscommit;
+        #    }
+        #
+        #    return retStr;
         #}
       ENDSOURCE
       SOURCE #search
@@ -374,6 +394,12 @@ Formatversion: 1
         #    return "Запуск классов RunBaseBatch из Business Connnector";
         #}
       ENDSOURCE
+      SOURCE #getAOSName
+        #static str getAOSName()
+        #{
+        #    return new xSession().AOSName();
+        #}
+      ENDSOURCE
       SOURCE #hasBatches
         #static boolean hasBatches(BatchGroupId groupId)
         #{
@@ -404,11 +430,12 @@ Formatversion: 1
         #}
       ENDSOURCE
       SOURCE #mainDo
-        #static str mainDo(BatchGroupId _groupId, boolean _cancelJobIfError = true)
+        #static str mainDo(BatchGroupId _groupId, boolean _cancelJobIfError = true, boolean _delBatchAfterSuccess = false)
         #{
         #    AxBatchRunner runner = AxBatchRunner::construct();
         #    runner.parmGroupId(_groupId);
         #    runner.parmCancelJobIfError(_cancelJobIfError);
+        #    runner.parmDelBatchAfterSuccess(_delBatchAfterSuccess);
         #
         #    return runner.doBatch();
         #}

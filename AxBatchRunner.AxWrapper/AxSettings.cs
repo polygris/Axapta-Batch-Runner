@@ -5,7 +5,7 @@ namespace AxBatchRunner.AxWrapper
     /// <summary>
     ///   Incapsulated Axapta settings;
     /// </summary>
-    public class AxSettings
+    public sealed class AxSettings
     {
         /// <summary>
         ///   Initalize default values
@@ -17,6 +17,7 @@ namespace AxBatchRunner.AxWrapper
             BatchRunnerMethod = "mainDo";
             CancelJobIfError = true;
             TimerInterval = 10;
+            DelBatchAfterSuccess = false;
         }
 
         private ushort _daxVersion;
@@ -51,11 +52,30 @@ namespace AxBatchRunner.AxWrapper
         /// </summary>
         public string Configuration { get; set; }
 
-        public string ObjectServer { get; set; }
+        /// <summary>
+        ///   The name of static method for instaniate batch runner class
+        /// </summary>
         public string BatchRunnerMethod { get; set; }
+
+        /// <summary>
+        ///   The name of batch runner class
+        /// </summary>
         public string BatchRunnerClass { get; set; }
+
+        /// <summary>
+        ///   The name of batch group
+        /// </summary>
         public string BatchGroup { get; set; }
+
+        /// <summary>
+        ///   Unschedule job if caused error
+        /// </summary>
         public bool CancelJobIfError { get; set; }
+
+        /// <summary>
+        ///   Delete completed batch if job successfuly completed
+        /// </summary>
+        public bool DelBatchAfterSuccess { get; set; }
 
         /// <summary>
         ///   Timer interval in sec.
@@ -74,11 +94,6 @@ namespace AxBatchRunner.AxWrapper
 
                 if (string.IsNullOrEmpty(Configuration))
                     throw new ArgumentNullException("Configuration", "Configuration can't be empty.");
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(ObjectServer))
-                    throw new ArgumentNullException("ObjectServer", "ObjectServer can't be empty.");
             }
 
             if (TimerInterval < 10)

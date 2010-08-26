@@ -37,6 +37,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Interop.AxaptaCOMConnector.DLL</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Dynamics.BusinessConnectorNet, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Microsoft Dynamics AX\40\Client\Bin\Microsoft.Dynamics.BusinessConnectorNet.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=1.0.0.505, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\NLog.dll</HintPath>
@@ -54,10 +58,6 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.Dynamics.BusinessConnectorNet">
-      <Name>Microsoft.Dynamics.BusinessConnectorNet</Name>
-      <HintPath>Microsoft.Dynamics.BusinessConnectorNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AxBusinessConnectorCom.cs" />

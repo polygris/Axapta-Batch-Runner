@@ -9,7 +9,7 @@
       <Value Profile="(Default)">mainDo</Value>
     </Setting>
     <Setting Name="TimerInterval" Type="System.UInt32" Scope="Application">
-      <Value Profile="(Default)">10000</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="CancelJobIfError" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
@@ -21,7 +21,7 @@
       <Value Profile="(Default)">password</Value>
     </Setting>
     <Setting Name="Configuration" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">configuration.name</Value>
+      <Value Profile="(Default)">ZCH_WORK_3T</Value>
     </Setting>
     <Setting Name="ComPlusAppl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Navision Axapta Business Connector</Value>
@@ -32,17 +32,14 @@
     <Setting Name="Company" Type="System.String" Scope="Application">
       <Value Profile="(Default)">company.name</Value>
     </Setting>
-    <Setting Name="BatchGroupId" Type="System.String" Scope="Application">
+    <Setting Name="BatchGroup" Type="System.String" Scope="Application">
       <Value Profile="(Default)">batch.group</Value>
-    </Setting>
-    <Setting Name="ObjectServer" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">appl@aos:2715</Value>
     </Setting>
     <Setting Name="DAXVersion" Type="System.UInt16" Scope="Application">
       <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="ConnectionString" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">appl@aos:2715</Value>
+    <Setting Name="DelBatchAfterSuccess" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

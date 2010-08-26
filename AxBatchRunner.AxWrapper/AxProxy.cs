@@ -1,7 +1,4 @@
 using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
 using NLog;
 
 namespace AxBatchRunner.AxWrapper
@@ -9,12 +6,13 @@ namespace AxBatchRunner.AxWrapper
     /// <summary>
     ///   Proxy for run Axapta classes
     /// </summary>
-    public class AxProxy : IDisposable
+    public sealed class AxProxy : IDisposable
     {
         private readonly IAxBusinessConnector _connector;
         private readonly AxSettings _settings;
         private readonly ThreadSafeFlag _isConnected = new ThreadSafeFlag();
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private AxConfig _config;
 
         /// <summary>
         ///   Hide default constructor
@@ -55,17 +53,19 @@ namespace AxBatchRunner.AxWrapper
         {
             try
             {
-                _logger.Info("Trying connect to Axapta...");
+                Logger.Info("Trying connect to Axapta...");
                 _connector.Logon(_settings.User, _settings.Password, _settings.Company, _settings.Language,
-                                 _settings.Configuration, _settings.ObjectServer);
+                                 _settings.Configuration);
                 _isConnected.Set();
-                _logger.Info("Axapta connected.");
+                _config = GetConfig();
+                Logger.Info("Axapta connected.");
+                Logger.Info("Connection info: {0}", _config);
             }
             catch (AxException exception)
             {
                 _isConnected.Clear();
-                _logger.Info("Failed connect to Axapta.");
-                _logger.Error(exception.Message);
+                Logger.Info("Failed connect to Axapta.");
+                Logger.Error(exception.Message);
             }
         }
 
@@ -83,7 +83,7 @@ namespace AxBatchRunner.AxWrapper
             return new AxConfig((string) _connector.CallStatic("xInfo", "serialNo"),
                                 (string) _connector.CallStatic("xInfo", "licenseName"),
                                 (bool) _connector.CallStatic("xGlobal", "isAOS"),
-                                (string)_connector.CallStatic(_settings.BatchRunnerClass, "getAOSName"));
+                                (string) _connector.CallStatic(_settings.BatchRunnerClass, "getAOSName"));
         }
 
         /// <summary>
@@ -91,16 +91,18 @@ namespace AxBatchRunner.AxWrapper
         /// </summary>
         /// <param name = "batchGroup">The name of  batch group</param>
         /// <param name = "cancelJobIfError">Not recuring job if error</param>
+        /// <param name = "delBatchAfterSuccess"></param>
         /// <returns>Response from RunBaseBatch (infolog)</returns>
-        public string StartBatch(string batchGroup, bool cancelJobIfError)
+        public string StartBatch(string batchGroup, bool cancelJobIfError, bool delBatchAfterSuccess)
         {
             string outStr = string.Empty;
 
             try
             {
-                outStr = (string)_connector.CallStatic(_settings.BatchRunnerClass,
-                                                      _settings.BatchRunnerMethod,
-                                                      batchGroup, cancelJobIfError);
+                outStr = (string) _connector.CallStatic(_settings.BatchRunnerClass,
+                                                        _settings.BatchRunnerMethod,
+                                                        batchGroup, cancelJobIfError,
+                                                        delBatchAfterSuccess);
             }
             catch (AxException)
             {
@@ -117,7 +119,7 @@ namespace AxBatchRunner.AxWrapper
         /// <returns>Response from RunBaseBatch (infolog)</returns>
         public string StartBatch(string batchGroup)
         {
-            return StartBatch(batchGroup, true);
+            return StartBatch(batchGroup, true, true);
         }
 
         /// <summary>
@@ -131,7 +133,7 @@ namespace AxBatchRunner.AxWrapper
 
             try
             {
-                hasBatches = (bool)_connector.CallStatic(_settings.BatchRunnerClass, "hasBatches", batchGroup);
+                hasBatches = (bool) _connector.CallStatic(_settings.BatchRunnerClass, "hasBatches", batchGroup);
             }
             catch (AxException)
             {
@@ -146,9 +148,21 @@ namespace AxBatchRunner.AxWrapper
         /// </summary>
         public void Dispose()
         {
-            if (_connector != null)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///   Implementation of the Dispose Pattern
+        /// </summary>
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _connector.Dispose();
+                if (_connector != null)
+                {
+                    _connector.Dispose();
+                }
             }
         }
 

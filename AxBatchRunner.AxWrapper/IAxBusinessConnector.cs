@@ -12,10 +12,8 @@ namespace AxBatchRunner.AxWrapper
         /// <param name = "company">Name of the company to logon</param>
         /// <param name = "language">Language of the user</param>
         /// <param name = "configuration">Configuration name to use for the client</param>
-        /// <param name = "objectServer">Axapta Server to logon (AOS)</param>
         /// <exception cref = "AxException">Thrown when logon attempt fails</exception>
-        void Logon(string user, string password, string company, string language, string configuration,
-                   string objectServer);
+        void Logon(string user, string password, string company, string language, string configuration);
 
         /// <summary>
         ///   Logoff from Axapta
@@ -49,9 +47,21 @@ namespace AxBatchRunner.AxWrapper
         /// <param name = "className">Name of the class</param>
         /// <param name = "methodName">Name of the static method</param>
         /// <param name = "param1">Parameter 1</param>
-        /// <param name = "param2">Parameter 1</param>
+        /// <param name = "param2">Parameter 2</param>
         /// <returns>Value returned by Axapta</returns>
         /// <exception cref = "AxException">Thrown when there is an exception in calling the static method.</exception>
         object CallStatic(string className, string methodName, object param1, object param2);
+
+        /// <summary>
+        ///   Calls an Axapta class static method.
+        /// </summary>
+        /// <param name = "className">Name of the class</param>
+        /// <param name = "methodName">Name of the static method</param>
+        /// <param name = "param1">Parameter 1</param>
+        /// <param name = "param2">Parameter 2</param>
+        /// <param name = "param3">Parameter 3</param>
+        /// <returns>Value returned by Axapta</returns>
+        /// <exception cref = "AxException">Thrown when there is an exception in calling the static method.</exception>
+        object CallStatic(string className, string methodName, object param1, object param2, object param3);
     }
 }

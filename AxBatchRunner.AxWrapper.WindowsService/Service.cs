@@ -12,7 +12,22 @@ namespace AxBatchRunner.WindowsService
         {
             InitializeComponent();
             Settings settings = new Settings();
-            AxSettings axSettings = new AxSettings();
+            AxSettings axSettings = new AxSettings
+                                        {
+                                            BatchGroup = settings.BatchGroup,
+                                            BatchRunnerClass = settings.BatchRunnerClass,
+                                            BatchRunnerMethod = settings.BatchRunnerMethod,
+                                            CancelJobIfError = settings.CancelJobIfError,
+                                            Company = settings.Company,
+                                            ComPlusAppl = settings.ComPlusAppl,
+                                            Configuration = settings.Configuration,
+                                            DaxVersion = settings.DAXVersion,
+                                            Language = settings.Language,
+                                            Password = settings.Password,
+                                            TimerInterval = settings.TimerInterval,
+                                            User = settings.User
+                                        };
+
             _scheduler = new AxBatchScheduler(axSettings);
         }
 

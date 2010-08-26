@@ -5,13 +5,14 @@ namespace AxBatchRunner.AxWrapper
     /// <summary>
     ///   Implement thread safe counter (long)
     /// </summary>
-    internal class ThreadSafeCounter
+    internal sealed class ThreadSafeCounter
     {
         private long _value;
+        private readonly object _locker = new object();
 
         public void Clear()
         {
-            lock (this)
+            lock (_locker)
             {
                 _value = 0;
             }
@@ -19,7 +20,7 @@ namespace AxBatchRunner.AxWrapper
 
         public void Decrement()
         {
-            lock (this)
+            lock (_locker)
             {
                 if (_value > 0L)
                 {

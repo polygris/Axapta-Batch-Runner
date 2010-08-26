@@ -15,20 +15,21 @@ namespace AxBatchRunner.ConsoleRunner
             axSettings3.Company = "ais";
             axSettings3.Language = "ru";
             axSettings3.ComPlusAppl = "Navision Axapta Business Connector";
-            axSettings3.Configuration = "ZCH_TEST_3T";
+            axSettings3.Configuration = "ZCH_DEV_3T";
             axSettings3.BatchGroup = "PR2";
             axSettings3.CancelJobIfError = false;
             axSettings3.TimerInterval = 10;
-
+            axSettings3.DelBatchAfterSuccess = true;
             axSettings3.ValidateSettings();
 
-            //AxSettings axSettings4 = new AxSettings();
+            AxSettings axSettings4 = new AxSettings();
             //axSettings4.ObjectServer = "DAX40@AX4:2714";
-            //axSettings4.Configuration = "DAX40";
-            //axSettings4.DaxVersion = 5;
-            //axSettings4.BatchGroup = "PR2";
-            //axSettings4.CancelJobIfError = false;
-            //axSettings4.TimerInterval = 10;
+            //axSettings4.ObjectServer = "DAX40@AX4:2714";
+            axSettings4.Configuration = "DAX40";
+            axSettings4.DaxVersion = 4;
+            axSettings4.BatchGroup = "PR2";
+            axSettings4.CancelJobIfError = false;
+            axSettings4.TimerInterval = 10;
 
             //axSettings4.ValidateSettings();
 
