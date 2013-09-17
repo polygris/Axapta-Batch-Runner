@@ -1,20 +1,18 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.AxWrapper", "AxBatchRunner.AxWrapper\AxBatchRunner.AxWrapper.csproj", "{1ABA62CC-4192-4B20-9CE6-CBC955C573C2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.ConsoleRunner", "AxBatchRunner.AxWrapper.ConsoleRunner\AxBatchRunner.ConsoleRunner.csproj", "{88310063-7E72-4745-A7C0-A62889748CFA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.WindowsService", "AxBatchRunner.AxWrapper.WindowsService\AxBatchRunner.WindowsService.csproj", "{0D55481D-2658-4C01-981E-16E6B3118493}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AxBatchRunner.Setup", "AxBatchRunner.Setup\AxBatchRunner.Setup.vdproj", "{8581A58E-B73A-4A20-8C63-06DB89AFE8B4}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{596DCD17-9796-459E-97B1-161450F911F5}"
 	ProjectSection(SolutionItems) = preProject
 		AxBatchRunner.build = AxBatchRunner.build
 		Class_AxBatchRunner.xpo = Class_AxBatchRunner.xpo
 		go.bat = go.bat
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.AxWrapper", "AxBatchRunner.AxWrapper\AxBatchRunner.AxWrapper.csproj", "{1ABA62CC-4192-4B20-9CE6-CBC955C573C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.ConsoleRunner", "AxBatchRunner.AxWrapper.ConsoleRunner\AxBatchRunner.ConsoleRunner.csproj", "{88310063-7E72-4745-A7C0-A62889748CFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.WindowsService", "AxBatchRunner.AxWrapper.WindowsService\AxBatchRunner.WindowsService.csproj", "{0D55481D-2658-4C01-981E-16E6B3118493}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxBatchRunner.Tests", "AxBatchRunner.Tests\AxBatchRunner.Tests.csproj", "{C207B3A3-97C4-4F24-BC2C-A248620ABA2D}"
 EndProject
@@ -36,8 +34,6 @@ Global
 		{0D55481D-2658-4C01-981E-16E6B3118493}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D55481D-2658-4C01-981E-16E6B3118493}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D55481D-2658-4C01-981E-16E6B3118493}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8581A58E-B73A-4A20-8C63-06DB89AFE8B4}.Debug|Any CPU.ActiveCfg = Debug
-		{8581A58E-B73A-4A20-8C63-06DB89AFE8B4}.Release|Any CPU.ActiveCfg = Release
 		{C207B3A3-97C4-4F24-BC2C-A248620ABA2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C207B3A3-97C4-4F24-BC2C-A248620ABA2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C207B3A3-97C4-4F24-BC2C-A248620ABA2D}.Release|Any CPU.ActiveCfg = Release|Any CPU

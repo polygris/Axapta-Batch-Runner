@@ -9,12 +9,11 @@ namespace AxBatchRunner.WindowsService
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[] 
-			{ 
-				new AxBatchRunnerService() 
-			};
-            ServiceBase.Run(ServicesToRun);
+            ServiceBase[] servicesToRun = new ServiceBase[] 
+            { 
+                new AxBatchRunnerService() 
+            };
+            ServiceBase.Run(servicesToRun);
         }
     }
 }

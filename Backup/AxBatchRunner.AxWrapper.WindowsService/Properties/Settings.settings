@@ -1,0 +1,45 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AxBatchRunner.WindowsService.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="BatchRunnerClass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AxBatchRunner</Value>
+    </Setting>
+    <Setting Name="BatchRunnerMethod" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">mainDo</Value>
+    </Setting>
+    <Setting Name="TimerInterval" Type="System.UInt32" Scope="Application">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="CancelJobIfError" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="User" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">user</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">password</Value>
+    </Setting>
+    <Setting Name="Configuration" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ZCH_WORK_3T</Value>
+    </Setting>
+    <Setting Name="ComPlusAppl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Navision Axapta Business Connector</Value>
+    </Setting>
+    <Setting Name="Language" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">language</Value>
+    </Setting>
+    <Setting Name="Company" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">company.name</Value>
+    </Setting>
+    <Setting Name="BatchGroup" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">batch.group</Value>
+    </Setting>
+    <Setting Name="DAXVersion" Type="System.UInt16" Scope="Application">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="DelBatchAfterSuccess" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
